@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-# import pylab as pl
+import pylab as pl
 
 
 ####################################
@@ -136,11 +136,57 @@ diversity = diversity.unstack('sex')
 # https://www.cnblogs.com/bambipai/p/7658311.html
 # 链接处解释非常透彻
 
-# print(diversity.head())
+print(diversity.head())
 
-diversity.plot(title="Number of popular names in top 50%")
+diversity.plot(title="Number of popular names in top 50%")   # ！！！！！问题标注。
 plt.show()
 # print(diversity)
+
+
+# 最后一个字母的变革
+get_last_letter = lambda x: x[-1]
+last_letter = names.name.map(get_last_letter)
+last_letter.name = 'last_letter'
+
+table = names.pivot_table('births', index=last_letter, columns=['sex', 'year'], aggfunc=sum)
+subtable = table.reindex(columns=[1910, 1960, 2010], level='year')
+# print(subtable.head())
+subtable.sum()  # 规范化处理。
+
+letter_prop = subtable / subtable.sum().astype(float)
+fig, axes = plt.subplots(2, 1, figsize=(10, 8))
+letter_prop['M'].plot(kind='bar', rot=0, ax=axes[0], title='Male')
+letter_prop['F'].plot(kind='bar', rot=0, ax=axes[1], title='Female', legend=False)
+# plt.show()
+
+# 男孩女孩各个末字母的比例
+letter_prop = table / table.sum().astype(float)
+dny_ts = letter_prop.ix[['d', 'n', 'y'], 'M'].T
+# ix——通过行标签或者行号索引行数据（基于loc和iloc 的混合）
+# loc——通过行标签索引行数据
+# iloc——通过行号索引行数据
+
+# dny_ts.plot()
+# plt.show()
+
+# 变成女孩名字的男孩名字
+all_names = top1000.name.unique()
+mask = np.array(['lesl' in x.lower() for x in all_names])
+lesley_like = all_names[mask]
+print(lesley_like)
+filtered = top1000[top1000.name.isin(lesley_like)]
+filtered.groupby('name').births.sum()
+
+table = filtered.pivot_table('births', index='year', columns='sex', aggfunc='sum')
+table = table.div(table.sum(1), axis=0)
+table.tail()
+
+table.plot(style={'M': 'k-', 'F': 'k--'})
+
+# plt.show()
+
+
+
 
 
 
