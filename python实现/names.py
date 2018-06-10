@@ -133,6 +133,8 @@ diversity = diversity.unstack('sex')
 # print('-'*30 + "华丽的分割线" + '-'*30)
 # unstack和stack(堆砌，堆积，堆叠)函数的使用：
 # stack从“表格结构”变成“花括号结构”，将行索引变成列索引。
+# https://www.cnblogs.com/bambipai/p/7658311.html
+# 链接处解释非常透彻
 
 # print(diversity.head())
 
