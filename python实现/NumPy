@@ -1,0 +1,144 @@
+NumPy
+
+特点：
+	矢量算术运算和复杂广播能力、快速多维数组。
+	读写磁盘数据、操作内存映射文件
+	线性代数、随机数生成、傅里叶变换
+	集成多种低级语言接口
+
+NumPy最重要特点：N维数组对象。
+	import numpy as np
+	
+数组方法：
+	shape,dtype,ndim
+
+
+创建N维数组：ndarray
+	array方法
+		np.array(数组)
+	zeros方法
+		np.zeros(10)
+	ones方法
+		np.ones(3.6)
+	empty方法
+		np.empty((2,3,2))
+		没有任何具体值。创建新数组，分配内存但不填充数据。
+	arange方法
+		np.arange(15)
+	eye,identity方法
+		np.eye(3)
+		np.identity(4)
+			创建对角矩阵
+
+N维数据类型：
+	astype方法：
+		float_arr = arr.astype(np.float64)
+		arr.astype(np.int32)小数部分将截断。
+		int_array.astype(calibers.dtype)
+
+		调用 astype无论何种情况都会创建一个新的数组。
+
+
+数组和标量之间的运算：
+
+	数组与标量之间的算术运算会传递到各个元素。
+	不同大小的数组之间的运算叫做广播。
+
+
+索引和切片：
+标量值赋值给切片时，该值会自动传播（“广播”）到整个选区。数组切片时原始数组的视图。数据不会被复制，在视图上的任何修改都会直接反映到源数组上。
+	arr = np.arange(10)
+	arr[5:8] = 12
+	arr_slice = arr[5:8]
+	arr_slice[1]=12345
+	arr_slice[:]=64
+
+	由于NumPy的设计目的是处理大数据：所以NumPy不会将数据来回复制！！！！
+	如果需要复制：
+		arr[5:8].copy()
+
+	数组中元素递归访问：
+	arr2d[0][2]
+		等价arr2d[0,2]
+
+		2*2*3两组两行三列
+		（[[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]]）
+
+	布尔式索引
+		data[data < 0] = 0
+			判断data中，负值设置为0。
+		data[names !='Joe']= 7
+			名字不为Joe的位置在data数组中对应赋值7。
+
+花式索引：
+	arr = np.arange(32).reshape((8,4))
+	arr[[1,5,7,2],[0,3,1,2]]
+	arr[[1,5,7,2]][:,[0,3,1,2]]
+		上述两行，取值不同。一个取回组合四个元素数组。另一个取回4*4矩阵数组。、
+
+数组转置和轴对称
+	arr = np.arrage(16).reshape((2,2,4))
+	arr.transpose（（1,0,2））
+		标号1和2行交换轴对称。
+
+	arr.swapaxes(1,2)
+	变成了2*4*2
+
+	modf将浮点数数组的小数和整数部分分离，以两个数组的形式返回。
+	
+
+将条件逻辑表述为数组运算：
+	x if c esle y
+	python写法：
+		result= [(x if c else y)]
+			for x,y,c in zip(xarr,yarr,cond)
+	where方法：
+		result = np.where(cond,xarr,yarr)
+
+		有时：嵌套写法：
+			np.where(cond1 & cond2,0,np.where(cond1,1,np.where(cond2,2,3)))
+
+
+arr.sort()：就地排序
+np.srot定积分方法：返回排序副本。
+np.unique(arr):去重
+	存在性：
+	values = np.array([6,0,0,3,2,5,6])
+	np.in1d(values,[2,3,6]):判断Values是否在后面列表中。
+intersect1d(x,y)计算公共元素。
+union(x,y)并集。
+setdiff1d(x,y):集合差。
+setxor1d(x,y):对称差：在存在一个，不在另一个中。
+
+
+数组文件输入输出：
+np.save（）
+np.load()
+np.savez("array_archive.npz",a=arr,b=arr):多个数组保存在一个压缩文件中。
+
+
+存取文本文件：
+	逗号分割文件（CSV）
+	arr = np.loadtxt('arr_test.txt',delimiter=',')
+	np.savetxt('test2',arr)
+
+
+线性代数：
+from numpy.linalg import inv,qr
+x.dot(y)：矩阵乘法。
+
+
+
+随机数生成：
+samples = np.random.normal(size=(4,4))标准正态分布。
+
+from random import normalvariate
+N=1000000
+%timeit samples = [normalvariate(0,1) for _ in xrange(N)]
+%timeit np.random.normal(size=N)    # 速度更快。
+
+
+
+
+
+
