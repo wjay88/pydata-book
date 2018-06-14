@@ -1,0 +1,177 @@
+pandas
+	数据分析的高级数据结构和操作工具。pandas基于NumPy构建的。
+
+
+约定：
+	from pandas import Series,DataFrame
+	import pandas as pd
+
+
+pandas两种最重要的数据结构：
+	Series和DataFrame
+	Series:
+		1、由一组数据。
+		2、与之相关的标签（索引）。
+		两部分组成。
+			obj = Series([4,7,-5,3])
+			obj.values
+			obj.index
+
+			obj2 = Series([4,7,-5,3],index=['d','b','a','c'])
+			obj2.index
+			obj2['a']
+			obj2[['c','a','d']]
+
+		NumPy数组运算会保留索引和值之间的链接。
+			obj2[obj2 > 0]选取正数。输出保留索引。
+			
+		可以将Python中的字典转化为Series:
+			sdata = {'Ohio':35000,'Texas':71000,'Oregon':16000,'Utah':5000}
+			obj3 = Series(sdata)
+			如果只传入字典：按索引取键值。
+			states = ['California','Ohio','Oregon','Texas']
+			obj4 = Series(sdata,index=states)
+			数值如果显示：NaN:not a number
+
+		Series最重要的作用/功能：在算术运算中会自动对其不同索引的数据。
+		Series的索引可以通过复制的方式就地修改：
+			obj.index = ['Bob','Steve','Jeff','Ryan']
+
+	DataFrame
+		表格型的数据结构，有序的列。既有行索引，又有列索引。
+		可以看做有Series组成的字典（共同用一个索引）
+
+		构建DataFrame
+			传入一个由等长列表或NumPy数组组成的字典。
+			data = {'State':['Ohio','Ohio','Ohio','Nevada','Nevada'],
+					'year':[2000,2001,2002,2001,2002],
+					'pop':[1.5,1.7,3.6,2,4,2.9]}
+			frame = DataFrame(data)
+			DataFrame(data,columns=['year','state','pop'])   
+			frame2 = DataFrame(data,columns=['year','state','pop','debt'],
+								index=['one','two','three','four','five'])
+
+			frame2.columns
+			frame2['state']
+			frame2.year
+
+			获取行；位置或名称。索引字段ix
+			frame.ix['three']
+
+			列赋值：frame2['debt'] 16.5
+			frame2['debt']=np.arange(5.)
+			匹配赋值：
+				val = Series([-1.2,-1.5,-1.7],index=['two','four','five'])
+				frame2['debt']=val
+
+			frame2['eastern']=frame2.stage=='Ohio'
+			新增没有的列，如果stage是Ohio则正则。
+			del frame2['eastern']删除列。
+
+			嵌套字典：
+			pop = {'Nevada':{2001:2.4,2002:2.9},'Ohio':{2000:1.5,2001:1.7,2002:3.6}}
+			frame3 = DataFrame(pop)
+			frame3.T
+
+		索引对象：
+			index对象是不可修改的（immutable）。
+			这样才能使Index对象在多个数据结构之间安全共享。
+
+	操作手段：
+		重新索引：reindex:会根据新索引重排。
+		obj.reindex(['a','b','c','d','e'],fill_value=0)
+
+		method选项：
+		obj3 = Series(['blue','purple','yellow'],index=[0,2,4])
+		obj3.reindex(range(6),method='ffill')
+		有序数据插值处理：method='ffill'参数。
+
+		frame = DataFrame(np.arange(9).reshape((3,3)),index=['a','c','d'],columns = ['Ohio','Texas','California'])
+
+		drop方法：返回删除指定值得新对象。
+		obj = Series(np.arange(5.),index=['a','b','c','d','e'])
+		new_obj = obj.drop(['d','c'])
+
+		索引、选取、过滤
+		obj[val]
+		obj.ix[val]:选取单行或者一组行
+		obj.ix[:,val]:选取单列或列子集
+
+		算术运算和数据对齐
+		obj1+obj2:相同索引就会相加，如果不同索引，就会出现NaN。此时做法：
+		obj1.add(obj2,fill_value=0),加项缺少的值填上零。
+		obj1.add(columns = obj2.columns,fill_value=0),也实现重新索引，多出项为0。
+
+		函数应用和映射：
+		f=lambda x:x.max() - x.min()
+		frame.apply(f)
+		frame.apply(f,axis=1)
+
+		作用到元素级的操作：
+		format = lambda x:'%.2f' % x
+		frame.applymap(format)
+
+		排序和排名
+			按字典排序：frame.sort_index()
+			降序排列：frame.sort_index(axis,ascending =False)
+			axis = 1:列排序。调整每行列元素顺序。（按行调整列）
+
+			按值对Series排序：
+			obj.order()
+			按多列排序：
+			frame.sort_index(by=['a','b'])
+
+			排名：
+				obj.rank()
+				obj.rank(method='first')
+				obj.rank(ascending = False,method='max')
+				frame.rank(axis=1) 作用在每行上，排列元素（按行调整列元素）
+
+			带有重复值的轴索引：
+				obj = Series(range(5),index=['a','a','b','b','c'])
+				obj.index.is_unique
+				obj['a']:相同值索引会返回一个Series。单值则：放回标量值。
+
+			汇总和计算描述统计：
+				axis:
+					0：按列对行元素操作
+					1：按行对列元素操作
+				frame.sum
+				frame.mean(axis=1,skipna=False):NaN值不排除。
+				间接统计：
+					idxmin、idxmax每列的最大值最小值。
+					df.idxmin（）
+				累计型：
+					df.cumsum()
+				统计汇总：
+					df.describe()
+
+			相关系数和协方差：
+				obj.corr(data)
+				obj.cov(data)
+
+			唯一值、值计数以及成员资格
+				uniques = obj.unique()
+				uniques2= obj.uniques.sort()
+				obj.value_counts()
+					value_counts()还是一个顶级的pandas方法。
+					pd.value_counts(obj.values,sort=False)
+				isin方法：判断矢量化集合成员资格。筛选索引打印。
+
+		处理缺失数据：
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

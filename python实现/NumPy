@@ -100,7 +100,7 @@ N维数据类型：
 
 
 arr.sort()：就地排序
-np.srot定积分方法：返回排序副本。
+np.srotNumPy顶级方法：返回排序副本。
 np.unique(arr):去重
 	存在性：
 	values = np.array([6,0,0,3,2,5,6])
